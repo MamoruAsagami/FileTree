@@ -1,0 +1,104 @@
+// Usage:
+//   gradle build    ... compile and build jar
+//
+
+plugins {
+    id 'application'
+    id ('org.javamodularity.moduleplugin') version "1.8.15"
+}
+
+def projectName = project.name
+def props = [
+    version: '1.2.0',
+    vendor: 'Computer Laboratory',
+    mainClassName: 'sophie.tools.FileTree',
+    mainModuleName: 'sophie.tools.filetree',
+    icon: 'src/main/resources/sophie/tools/FileTree.ico',
+    fatJar: true,  // It should be false when you use jlink
+    console: false,
+    launcher: [
+        jvmArgs: [
+            // '-Xms512m',
+            // '-Xmx1024m',
+            // '-Xss256k'
+        ],
+        args: []
+    ],
+    installerOptions: [
+        //'--win-per-user-install',
+        '--install-dir', "Sophie/${projectName}",
+        '--win-dir-chooser',
+        '--win-menu-group', 'Sophie',
+        '--win-menu',
+        //'--win-shortcut',
+ 		'--win-upgrade-uuid', 'b9d9c42c-8d82-407b-bff4-92785f9f3b20',
+    ]
+]
+def SystemDrive = System.getenv('SystemDrive')?: ''
+
+java {
+    java.modularity.inferModulePath.set(false)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+task copyBin(type: Copy) {
+    from 'src/main/java'
+    into 'build/classes/java/main'
+    include '**/**.class'
+}
+
+compileJava {
+    dependsOn copyBin
+    options.encoding = 'UTF-8'
+    //options.compilerArgs << '-Xlint:deprecation'
+    //options.compilerArgs << '-Xlint:unchecked'
+    //options.forkOptions.jvmArgs << '-Duser.language=en'
+    //options.forkOptions.jvmArgs << '-Duser.country=US'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation ('org.apache.commons:commons-lang3:3.21.0')
+    implementation ('org.apache.commons:commons-text:1.15.0')
+    implementation ('org.jclarion:image4j:0.7')
+    // Append additional dependencies, if any.
+}
+jar {
+    // The jar is input of jlink, and it doesn't like fat jar saying "Two versions of module xxx found in project/build/jlinkbase/jlinkjars.
+    if(props.fatJar) {
+        // Fat jar
+        from files('build/classes/java/main')
+        from (configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it)}) {
+            //exclude 'META-INF/**/*'
+            //exclude 'org/apache/log4j/'
+            exclude 'META-INF/*.SF'    // Could be Included in signed jar
+            exclude 'META-INF/*.DSA'   // Could be Included in signed jar
+            exclude 'META-INF/*.RSA'   // Could be Included in signed jar
+        }
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        manifest {
+        	attributes[ 'Main-Class'] = props.mainClassName
+        }
+    } else {
+        // Thin jar
+        from files('build/classes/java/main')
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    //options.compilerArgs.addAll(["--module-path", classpath.asPath])
+    //classpath = files()  // clear class path
+}
+
+application {
+    mainClass = props.mainClassName
+    mainModule = props.mainModuleName
+}
