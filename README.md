@@ -51,13 +51,13 @@ This dialog window controls how the tree is rendered as text file.
 |----|----|
 |<button type="button">Text Tree File</button>| File chooser is shown for you to choose a file to write the tree text.|
 | [Text/Tree/File/Path                            ] text field | Text Tree File text file is shown. This field can work as drag & drop target from file browser. |
-|Unicode radio button|Unicode Box Drawing characters, └├│─, will be used to render tree.|
-|ASCII radio button|ASCII characters, +-\|, will be used to render tre|
-|Unicode Icon checkbox|Unicode file icons will be used to make the tree|
+|Unicode radio button|Unicode Box Drawing characters, └├│─, will be used to render the file tree.|
+|ASCII radio button|ASCII characters, +-\|, will be used to render the tree.|
+|Unicode Icon checkbox|Unicode file icons will be used to make the file tree.|
 |Directory suffix(/) checkbox|'/' will be suffixed after directory name.|
 |Spacing|Controls spaces leading before vertical line, trailing after vertical line, before icon and before file name.|
-|\<html\> ... \</html\> checkbox|Encloses the tree text by html envelop. You can preview the result by your favor|
-|\<pre\> ... \</pre\> checkbox|Encloses the tree text by pre-formatted envelop.|
+|\<html\> ... \</html\> checkbox|Encloses the tree text by html envelope. You can preview the result by your favorite browser.|
+|\<pre\> ... \</pre\> checkbox|Encloses the tree text by pre-formatted envelope.|
 |<button type="button">File</button>|Writes the tree in the specified file above.|
 |<button type="button">Close</button>|Closes the dialog|
 
