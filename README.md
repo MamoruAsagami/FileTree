@@ -33,14 +33,14 @@ $ java -jar /<path-to-jar-file>/FileTree.jar
 Otherwise, in most cases, all you have to do is simply double-click FileTree.jar icon.
 
 ## 3 User Interface
-### 3.1 Main Windows
+### 3.1 Main window
 
 |Item|Description|
 |-------|-------------------------|
-|<button type="button">Base Directory</button>| File chooser is shown for you to choose a base directory of the filesystem.|
+|<kbd>Base Directory</kbd>| File chooser is shown for you to choose a base directory of the filesystem.|
 | [Base/File/Path         ] text field | The base directory is shown. This field can work as drag & drop target from file browser. |
-|<button type="button">Make</button>|Generates a file tree in the tree pane below.|
-|<button type="button">File</button>| Shows File dialog for you to file the tree as text file.|
+|<kbd>Make</kbd>|Generates a file tree in the tree pane below.|
+|<kbd>File</kbd>| Shows File dialog for you to file the tree as text file.|
 |tree-manipulation-handle|You can expand and collapse any point of the tree by clicking the handle icon.|
 |context-menu|Right-clicking of an item will show up context-menu for you to modify the tree.|
 
@@ -49,7 +49,7 @@ This dialog window controls how the tree is rendered as text file.
 
 |Item|Description|
 |----|----|
-|<button type="button">Text Tree File</button>| File chooser is shown for you to choose a file to write the tree text.|
+|<kbd>Text Tree File</kbd>| File chooser is shown for you to choose a file to write the tree text.|
 | [Text/Tree/File/Path                            ] text field | Text Tree File text file is shown. This field can work as drag & drop target from file browser. |
 |🔘 Unicode|Unicode Box Drawing characters, └├│─, will be used to render the file tree.|
 |🔘 ASCII|ASCII characters, +-\|, will be used to render the tree.|
@@ -58,6 +58,6 @@ This dialog window controls how the tree is rendered as text file.
 |Spacing|Controls spaces leading before vertical line, trailing after vertical line, before icon and before file name.|
 |☑ \<html\> ... \</html\>|Encloses the tree text by html envelope. You can preview the result by your favorite browser.|
 |☑ \<pre\> ... \</pre\>|Encloses the tree text by pre-formatted envelope.|
-|<button type="button">File</button>|Writes the tree in the specified file above.|
-|<button type="button">Close</button>|Closes the dialog|
+|<kbd>File</kbd>|Writes the tree in the specified file above.|
+|<kbd>Close</kbd>|Closes the dialog|
 
