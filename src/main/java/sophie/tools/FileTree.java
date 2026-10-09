@@ -41,6 +41,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -50,8 +51,16 @@ import sophie.util.IconList;
 import sophie.widget.ErrorMessageDialog;
 import sophie.widget.JFileTextField;
 
+/*
+ * Revision notes
+ * 1.2.0 Supported filing as tree text file.
+ * 1.2.1 Supported selection removing, that is, multiple node removals of a single parent.
+ *       Remove others had been implemented as Remove others recursively.  Fixed it so that it acts on a single parent.
+ * 
+ */
+@SuppressWarnings("serial")
 public class FileTree extends JPanel {
-	private static final String VERSION = "1.2.0";
+	private static final String VERSION = "1.2.1";
 	static final String TITLE = FileTree.class.getSimpleName() + " " + VERSION;
 	PrintWriter report;
 	FileTreeState fileTreeState;
@@ -156,6 +165,14 @@ public class FileTree extends JPanel {
 			this.name = name;
 		}
 
+		public Date getLastModified() {
+			return lastModified;
+		}
+
+		public void setLastModified(Date lastModified) {
+			this.lastModified = lastModified;
+		}
+
 		void delete(File file) {
 			file.delete();
 		}
@@ -243,6 +260,30 @@ public class FileTree extends JPanel {
 			parent.add(node);
 			removeOthersRecursivly(parent);
 		}	
+	}
+
+	DefaultMutableTreeNode[] selectedChildNodes(DefaultMutableTreeNode parent) {
+		ArrayList<DefaultMutableTreeNode> nodeList = new ArrayList<>();
+		TreeNode[] parentPath = parent.getPath();
+		TreePath[] selections = treeView.getSelectionPaths();
+		if(selections != null) {
+			for(TreePath selected: selections) {
+				Object[] selectedPath = selected.getPath();
+				if(selectedPath.length == parentPath.length + 1) {
+					// Possibly child
+					int i;
+					for(i = 0; i < parentPath.length; i++) {
+						if(selectedPath[i] != parentPath[i])
+							break;
+					}
+					if(i == parentPath.length) {
+						// Surely child
+						nodeList.add((DefaultMutableTreeNode)selectedPath[i]);
+					}
+				}
+			}
+		}
+		return nodeList.toArray(new DefaultMutableTreeNode[nodeList.size()]);
 	}
 
 	public FileTree() throws IOException {
@@ -386,7 +427,17 @@ public class FileTree extends JPanel {
 		menu.add(item=new JMenuItem("Remove"));
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				menuNode.removeFromParent();
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode)menuNode.getParent();
+				if(parent != null) {
+					DefaultMutableTreeNode[] selections = selectedChildNodes(parent);
+					if(selections.length > 0) {
+						for(DefaultMutableTreeNode selection: selections) {
+							selection.removeFromParent();
+						}
+					} else {
+						menuNode.removeFromParent();
+					}
+				}	
 				treeView.clearSelection();
 				treeView.updateUI();
 
@@ -397,9 +448,27 @@ public class FileTree extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				DefaultMutableTreeNode parent = (DefaultMutableTreeNode)menuNode.getParent();
 				if(parent != null) {
-					parent.removeAllChildren();
-					parent.add(menuNode);
-					removeOthersRecursivly(parent);
+					DefaultMutableTreeNode[] selections = selectedChildNodes(parent);
+					if(selections.length > 0) {
+						ArrayList<TreeNode> removables = new ArrayList<>();
+						for(var i = parent.children(); i.hasMoreElements();) {
+							TreeNode t = i.nextElement();
+							int j;
+							for(j = 0; j < selections.length; j++) {
+								if(selections[j] == t)
+									break;
+							}
+							if(j == selections.length) {
+								removables.add(t);
+							}
+						}
+						for(TreeNode t: removables) {
+							parent.remove((DefaultMutableTreeNode)t);
+						}
+					} else {
+						parent.removeAllChildren();
+						parent.add(menuNode);
+					}
 				}	
 				treeView.clearSelection();
 				treeView.updateUI();
@@ -409,7 +478,31 @@ public class FileTree extends JPanel {
 		menu.add(item=new JMenuItem("Remove others recursivly"));
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				removeOthersRecursivly(menuNode);
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode)menuNode.getParent();
+				if(parent != null) {
+					DefaultMutableTreeNode[] selections = selectedChildNodes(parent);
+					if(selections.length > 0) {
+						ArrayList<TreeNode> removables = new ArrayList<>();
+						for(var i = parent.children(); i.hasMoreElements();) {
+							TreeNode t = i.nextElement();
+							int j;
+							for(j = 0; j < selections.length; j++) {
+								if(selections[j] == t)
+									break;
+							}
+							if(j == selections.length) {
+								removables.add(t);
+							}
+						}
+						for(TreeNode t: removables) {
+							parent.remove((DefaultMutableTreeNode)t);
+						}
+					} else {
+						parent.removeAllChildren();
+						parent.add(menuNode);
+					}
+				}	
+				removeOthersRecursivly(parent);
 				treeView.clearSelection();
 				treeView.updateUI();
 

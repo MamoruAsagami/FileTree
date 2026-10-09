@@ -9,7 +9,7 @@ plugins {
 
 def projectName = project.name
 def props = [
-    version: '1.2.0',
+    version: '1.2.1',
     vendor: 'Computer Laboratory',
     mainClassName: 'sophie.tools.FileTree',
     mainModuleName: 'sophie.tools.filetree',
